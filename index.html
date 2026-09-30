@@ -145,6 +145,14 @@ td.num{font-variant-numeric:tabular-nums;text-align:center}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 @media (prefers-reduced-motion:reduce){.music.playing svg{animation:none}}
 
+/* Mural de recados */
+.mural-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.recado-card{background:var(--paper-2);border:1px solid var(--line);border-radius:4px;padding:18px 18px 14px;display:flex;flex-direction:column;gap:10px;position:relative}
+.recado-card::before{content:"“";position:absolute;top:-6px;left:12px;font-family:var(--f-body);font-size:3rem;line-height:1;color:var(--gold-light)}
+.recado-card p{font-style:italic;font-size:1.02rem;margin:0;padding-top:8px}
+.recado-card span{font-family:var(--f-cap);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-deep)}
+.mural-intro{text-align:center;color:var(--ink-soft);font-style:italic;margin:-6px 0 18px}
+
 .rays{transform-origin:130px 70px;animation:glow 6s ease-in-out infinite}
 @keyframes glow{0%,100%{opacity:.55}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.rays{animation:none}}
@@ -309,12 +317,18 @@ td.num{font-variant-numeric:tabular-nums;text-align:center}
     </div>
     <p class="err" id="err" hidden></p>
     <button class="submit" type="submit">Enviar confirmação pelo WhatsApp</button>
-    <p class="hint">Ao tocar no botão, o WhatsApp abre com sua mensagem pronta. É só enviar.</p>
+    <p class="hint">Ao tocar no botão, o WhatsApp abre com sua mensagem pronta. É só enviar. Seu recado pode aparecer no mural do site.</p>
   </form>
   <div class="done" id="done" hidden>
     <p>Sua mensagem está pronta no WhatsApp. Se não abriu, <a id="wa-fallback" href="#" target="_blank" rel="noopener">toque aqui</a> ou envie para <strong id="wa-num"></strong>.</p>
     <button type="button" class="btn-link" id="again">Fazer outra confirmação</button>
   </div>
+</section>
+
+<section id="mural" hidden aria-labelledby="h-mural">
+  <h2 id="h-mural">Recados para a Laura</h2>
+  <p class="mural-intro">Carinhos e bênçãos deixados pela família e pelos amigos.</p>
+  <div class="mural-list" id="mural-list"></div>
 </section>
 
 <footer>Com carinho e fé,<br><span id="sign"></span><small>11 · 10 · 2026</small></footer>
@@ -362,7 +376,15 @@ const CONVITE = {
   madrinha: "Thamires",
   padrinho: "Leonardo",
   whatsapp: "5514981087903",      // DDI + DDD + número, só dígitos
-  dataHora: "2026-10-11T09:00:00-03:00"
+  dataHora: "2026-10-11T09:00:00-03:00",
+
+  /* Mural de recados — copie a linha de exemplo, troque nome e texto.
+     Cada recado entre chaves { }, separados por vírgula.
+     Enquanto a lista estiver vazia, o mural fica escondido. */
+  recados: [
+    // { nome: "Vovó Maria", texto: "Que Deus te abençoe sempre, minha netinha!" },
+    { nome: "Família Barbosa", texto: "Que o Papai do Céu e Nossa Senhora cubram você sempre com o manto sagrado, iluminando sua vida e seus caminhos. É uma honra imensa cuidar de você espiritualmente. Conte comigo para tudo, hoje e sempre!" },
+  ]
 };
 /* ========================================= */
 
@@ -518,6 +540,20 @@ const esc = x => String(x ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;
     if (a.paused) { userPaused = false; a.play().catch(() => {}); } else { userPaused = true; a.pause(); }
   });
   document.addEventListener("visibilitychange", () => { if (document.hidden) a.pause(); else if (!userPaused) a.play().catch(() => {}); });
+})();
+
+/* Mural de recados */
+(() => {
+  const list = (CONVITE.recados || []).filter(r => r && r.texto);
+  if (!list.length) return;
+  const box = $("mural-list");
+  list.forEach(r => {
+    const c = document.createElement("figure"); c.className = "recado-card"; c.style.margin = "0";
+    const t = document.createElement("p"); t.textContent = r.texto;
+    const n = document.createElement("span"); n.textContent = r.nome || "";
+    c.append(t, n); box.append(c);
+  });
+  $("mural").hidden = false;
 })();
 </script>
 </body>
